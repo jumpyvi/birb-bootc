@@ -1,15 +1,23 @@
-FROM docker.io/library/debian:unstable
+FROM scratch AS ctx
+COPY build_files /
+
+FROM git.pika-os.com/repo-tools/docker-images/pikaos-base:nestv3
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+RUN dpkg --add-architecture i386 && \
+    apt-get update -y && \
+    apt-get dist-upgrade -y && \
+    apt-get clean -y
+
 RUN --mount=type=tmpfs,dst=/tmp --mount=type=tmpfs,dst=/root --mount=type=tmpfs,dst=/boot apt update -y && \
-  apt install -y btrfs-progs dosfstools e2fsprogs fdisk firmware-linux-free linux-image-generic skopeo systemd systemd-boot* xfsprogs && \
+    apt install -y kernel-pika btrfs-progs dosfstools e2fsprogs fdisk skopeo systemd systemd-boot && \
   cp /boot/vmlinuz-* "$(find /usr/lib/modules -maxdepth 1 -type d | tail -n 1)/vmlinuz" && \
   apt clean -y
 
 # Setup a temporary root passwd (changeme) for dev purposes
-# RUN apt update -y && apt install -y whois
-# RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
+RUN apt update -y && apt install -y whois
+RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
 
 ENV CARGO_HOME=/tmp/rust
 ENV RUSTUP_HOME=/tmp/rust
@@ -25,6 +33,12 @@ RUN --mount=type=tmpfs,dst=/tmp --mount=type=tmpfs,dst=/root --mount=type=tmpfs,
     apt purge -y git curl make build-essential go-md2man libzstd-dev pkgconf libostree-dev && \
     apt autoremove -y && \
     apt clean -y
+
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/log \
+    --mount=type=tmpfs,dst=/tmp \
+    /ctx/build.sh
 
 # Necessary for general behavior expected by image-based systems
 RUN sed -i 's|^HOME=.*|HOME=/var/home|' "/etc/default/useradd" && \
