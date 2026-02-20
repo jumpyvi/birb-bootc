@@ -1,12 +1,11 @@
-# Debian Bootc
+# PikaOS (Unofficial & Experimental) BootC + composefs image
 
-Reference [Debian](https://debian.org/) container image preconfigured for [bootc](https://github.com/bootc-dev/bootc) usage.
+<img width="1656" height="934" alt="image" src="https://github.com/user-attachments/assets/4e12ce11-1109-4232-ab4d-33d3c022a0e0" />
 
-<img width="2196" height="1239" alt="image" src="https://github.com/user-attachments/assets/0b031de0-5593-49e8-8e5a-535ebdcf46e3" />
 
 ## Building
 
-In order to get a running debian-bootc system you can run the following steps:
+In order to get a running pikaos system you can run the following steps:
 ```shell
 just build-containerfile # This will build the containerfile and all the dependencies you need
 just generate-bootable-image # Generates a bootable image for you using bootc!
@@ -16,4 +15,6 @@ Then you can run the `bootable.img` as your boot disk in your preferred hypervis
 
 ## Notes
 
-For Debian Stable, please take a look at <https://github.com/linuxsnow/debian-bootc-core> or pull request workflows in order to make it work in this repo. Thank you!
+Core code made by @bootcrew (thank you)
+
+For vanilla Debian Stable, please take a look at <https://github.com/linuxsnow/debian-bootc-core>
